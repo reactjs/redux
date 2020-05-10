@@ -254,7 +254,7 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
    *
    * @param nextReducer The reducer for the store to use instead.
    */
-  function replaceReducer(nextReducer: Reducer<S, A>): void {
+  function replaceReducer(nextReducer: Reducer<S, A>) {
     if (typeof nextReducer !== 'function') {
       throw new Error('Expected the nextReducer to be a function.')
     }
