@@ -2,11 +2,6 @@ import { Action, AnyAction } from './actions'
 import { Reducer } from './reducers'
 
 /**
- * Internal "virtual" symbol used to make the `CombinedState` type unique.
- */
-declare const $CombinedState: unique symbol
-
-/**
  * Extend the state
  *
  * This is used by store enhancers and store creators to extend state.
@@ -19,6 +14,11 @@ declare const $CombinedState: unique symbol
 export type ExtendState<State, Extension> = [Extension] extends [never]
   ? State
   : State & Extension
+
+/**
+ * Internal "virtual" symbol used to make the `CombinedState` type unique.
+ */
+declare const $CombinedState: unique symbol
 
 /**
  * State base type for reducers created with `combineReducers()`.
