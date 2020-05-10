@@ -5,8 +5,7 @@ import {
   PreloadedState,
   StoreEnhancer,
   Dispatch,
-  Observer,
-  ExtendState
+  Observer
 } from './types/store'
 import { Action } from './types/actions'
 import { Reducer } from './types/reducers'
@@ -41,32 +40,32 @@ import isPlainObject from './utils/isPlainObject'
 export default function createStore<
   S,
   A extends Action,
-  Ext = {},
-  StateExt = never
+  Ext,
+  StateExt
 >(
   reducer: Reducer<S, A>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+): Store<S & StateExt, A> & Ext
 export default function createStore<
   S,
   A extends Action,
-  Ext = {},
-  StateExt = never
+  Ext,
+  StateExt
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+): Store<S & StateExt, A> & Ext
 export default function createStore<
   S,
   A extends Action,
-  Ext = {},
-  StateExt = never
+  Ext,
+  StateExt
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext {
+): Store<S & StateExt, A> & Ext {
   if (
     (typeof preloadedState === 'function' && typeof enhancer === 'function') ||
     (typeof enhancer === 'function' && typeof arguments[3] === 'function')
@@ -91,7 +90,7 @@ export default function createStore<
     return enhancer(createStore)(
       reducer,
       preloadedState as PreloadedState<S>
-    ) as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+    ) as Store<S & StateExt, A> & Ext
   }
 
   if (typeof reducer !== 'function') {
@@ -265,34 +264,21 @@ export default function createStore<
    * implement a hot reloading mechanism for Redux.
    *
    * @param nextReducer The reducer for the store to use instead.
-   * @returns The same store instance with a new reducer in place.
    */
-  function replaceReducer<NewState, NewActions extends A>(
-    nextReducer: Reducer<NewState, NewActions>
-  ): Store<ExtendState<NewState, StateExt>, NewActions, StateExt, Ext> & Ext {
+  function replaceReducer(
+    nextReducer: Reducer<S, A>
+  ): void {
     if (typeof nextReducer !== 'function') {
       throw new Error('Expected the nextReducer to be a function.')
     }
 
-    // TODO: do this more elegantly
-    ;((currentReducer as unknown) as Reducer<
-      NewState,
-      NewActions
-    >) = nextReducer
+    currentReducer = nextReducer
 
     // This action has a similar effect to ActionTypes.INIT.
     // Any reducers that existed in both the new and old rootReducer
     // will receive the previous state. This effectively populates
     // the new state tree with any relevant data from the old one.
     dispatch({ type: ActionTypes.REPLACE } as A)
-    // change the type of the store by casting it to the new store
-    return (store as unknown) as Store<
-      ExtendState<NewState, StateExt>,
-      NewActions,
-      StateExt,
-      Ext
-    > &
-      Ext
   }
 
   /**
@@ -340,12 +326,11 @@ export default function createStore<
   // the initial state tree.
   dispatch({ type: ActionTypes.INIT } as A)
 
-  const store = ({
+  return ({
     dispatch: dispatch as Dispatch<A>,
     subscribe,
     getState,
     replaceReducer,
     [$$observable]: observable
-  } as unknown) as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
-  return store
+  } as unknown) as Store<S & StateExt, A> & Ext
 }
