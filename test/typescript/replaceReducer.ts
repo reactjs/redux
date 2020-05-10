@@ -1,4 +1,4 @@
-import { combineReducers, createStore } from '../..'
+import { CombinedState, combineReducers, createStore, Reducer, Store } from '../..'
 
 /**
  * verify that replaceReducer maintains strict typing if the new types change
@@ -18,7 +18,8 @@ firstState.bar.value
 // typings:expect-error
 firstState.baz.value
 
-const nextStore = store.replaceReducer(combineReducers({ baz })) // returns ->  { baz: { value: 'baz' }}
+store.replaceReducer(combineReducers({ baz }) as unknown as Reducer<CombinedState<{ bar: { value: string } }>>) // returns ->  { baz: { value: 'baz' }}
+const nextStore = store as unknown as Store<CombinedState<{ baz: { value: string } }>>
 
 const nextState = nextStore.getState()
 // typings:expect-error

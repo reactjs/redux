@@ -111,7 +111,7 @@ export type Observer<T> = {
 export interface Store<
   S = any,
   A extends Action = AnyAction,
-  StateExt = never
+  StateExt = {}
 > {
   /**
    * Dispatches an action. It is the only way to trigger a state change.
@@ -208,7 +208,7 @@ export interface Store<
  * @template StateExt State extension that is mixed into the state type.
  */
 export interface StoreCreator {
-  <S, A extends Action, Ext = {}, StateExt = never>(
+  <S, A extends Action, Ext = {}, StateExt = {}>(
     reducer: Reducer<S, A>,
     enhancer?: StoreEnhancer<Ext, StateExt>
   ): Store<S, A, StateExt> & Ext
@@ -240,10 +240,10 @@ export interface StoreCreator {
  * @template Ext Store extension that is mixed into the Store type.
  * @template StateExt State extension that is mixed into the state type.
  */
-export type StoreEnhancer<Ext = {}, StateExt = never> = (
+export type StoreEnhancer<Ext = {}, StateExt = {}> = (
   next: StoreEnhancerStoreCreator
 ) => StoreEnhancerStoreCreator<Ext, StateExt>
-export type StoreEnhancerStoreCreator<Ext = {}, StateExt = never> = <
+export type StoreEnhancerStoreCreator<Ext = {}, StateExt = {}> = <
   S = any,
   A extends Action = AnyAction
 >(

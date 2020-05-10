@@ -1,4 +1,4 @@
-import { StoreEnhancer, Action, AnyAction, Reducer, createStore, Store } from '../..'
+import { StoreEnhancer, Action, AnyAction, Reducer, createStore, Store, StoreEnhancerStoreCreator } from '../..'
 
 interface State {
   someField: 'string'
@@ -49,14 +49,14 @@ function stateExtension() {
     extraField: 'extra'
   }
 
-  const enhancer: StoreEnhancer<{}, ExtraState> = createStore => <
+  const enhancer: StoreEnhancer<{}, ExtraState> = (createStore) => <
     S,
     A extends Action = AnyAction
   >(
     reducer: Reducer<S, A>,
     preloadedState?: any
-  ) => {
-    const wrappedReducer: Reducer<S & ExtraState, A> = (state, action) => {
+  ): Store<S, A, ExtraState> => {
+    const wrapReducer = (reducer: Reducer<S, A>): Reducer<S & ExtraState, A> => (state, action) => {
       const newState = reducer(state, action)
       return {
         ...newState,
@@ -69,7 +69,13 @@ function stateExtension() {
           extraField: 'extra'
         }
       : undefined
-    return createStore(wrappedReducer, wrappedPreloadedState)
+    const store = createStore(wrapReducer(reducer), wrappedPreloadedState)
+    return {
+      ...store,
+      replaceReducer(nextReducer: Reducer<S, A>) {
+        store.replaceReducer(wrapReducer(nextReducer))
+      }
+    }
   }
 
   const store = createStore(reducer, enhancer)
@@ -141,7 +147,7 @@ function replaceReducerExtender() {
   ) => state
 
   store.replaceReducer(newReducer as Reducer)
-  const newStore = store as unknown as Store<{ test: boolean } & ExtraState> & { method(): string };
+  const newStore = store as unknown as Store<{ test: boolean }, AnyAction, ExtraState> & { method(): string };
   newStore.getState().test
   newStore.getState().extraField
   // typings:expect-error
@@ -223,7 +229,8 @@ function mhelmersonExample() {
       _: AnyAction
     ) => state
 
-    const newStore = store.replaceReducer(newReducer)
+    store.replaceReducer(newReducer as Reducer)
+    const newStore = store as unknown as Store<{ test: boolean }, AnyAction, ExtraState>;
     newStore.getState().test
     newStore.getState().extraField
     // typings:expect-error
@@ -266,7 +273,7 @@ function finalHelmersonExample() {
 
       return {
         ...store,
-        replaceReducer: nextReducer => {
+        replaceReducer: (nextReducer: Reducer<S, A>) => {
           return store.replaceReducer(
             persistReducer(persistConfig, nextReducer)
           )
@@ -287,7 +294,8 @@ function finalHelmersonExample() {
     _: AnyAction
   ) => state
 
-  const newStore = store.replaceReducer(newReducer)
+  store.replaceReducer(newReducer as Reducer)
+  const newStore = store as unknown as Store<{ test: boolean }>
   newStore.getState().test
   // typings:expect-error
   newStore.getState().whatever
