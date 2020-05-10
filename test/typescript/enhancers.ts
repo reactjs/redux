@@ -1,4 +1,4 @@
-import { StoreEnhancer, Action, AnyAction, Reducer, createStore } from '../..'
+import { StoreEnhancer, Action, AnyAction, Reducer, createStore, Store } from '../..'
 
 interface State {
   someField: 'string'
@@ -88,8 +88,10 @@ function extraMethods() {
     ...args
   ) => {
     const store = createStore(...args)
-    store.method = () => 'foo'
-    return store
+    return {
+      ...store,
+      method: () => 'foo'
+    }
   }
 
   const store = createStore(reducer, enhancer)
@@ -128,7 +130,7 @@ function replaceReducerExtender() {
           extraField: 'extra'
         }
       : undefined
-    return createStore(wrappedReducer, wrappedPreloadedState)
+    return { ...createStore(wrappedReducer, wrappedPreloadedState), method: () => 'foo' };
   }
 
   const store = createStore(reducer, enhancer)
@@ -138,7 +140,8 @@ function replaceReducerExtender() {
     _: AnyAction
   ) => state
 
-  const newStore = store.replaceReducer(newReducer)
+  store.replaceReducer(newReducer as Reducer)
+  const newStore = store as unknown as Store<{ test: boolean } & ExtraState> & { method(): string };
   newStore.getState().test
   newStore.getState().extraField
   // typings:expect-error
@@ -188,13 +191,10 @@ function mhelmersonExample() {
       const store = createStore(wrappedReducer, wrappedPreloadedState)
       return {
         ...store,
-        replaceReducer<NS, NA extends Action = AnyAction>(
-          nextReducer: (
-            state: (NS & ExtraState) | undefined,
-            action: NA
-          ) => NS & ExtraState
+        replaceReducer(
+          nextReducer: Reducer<S, A>
         ) {
-          const nextWrappedReducer: Reducer<NS & ExtraState, NA> = (
+          const nextWrappedReducer: Reducer<S & ExtraState, A> = (
             state,
             action
           ) => {
@@ -204,7 +204,7 @@ function mhelmersonExample() {
               extraField: 'extra'
             }
           }
-          return store.replaceReducer(nextWrappedReducer)
+          store.replaceReducer(nextWrappedReducer)
         }
       }
     }

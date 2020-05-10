@@ -12,7 +12,7 @@ describe('replaceReducers test', () => {
     })
 
     store.dispatch({ type: 'INIT' });
-    expect(store.getState().type).toBe(5);
+    expect(store.getState().type).toBe('INIT');
 
     store.replaceReducer(nextReducer as unknown as Reducer<AnyAction>)
     const nextStore = store as unknown as Store<CombinedState<{ foo: unknown; bar: unknown; }>>;
