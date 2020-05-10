@@ -108,11 +108,7 @@ export type Observer<T> = {
  * @template A the type of actions which may be dispatched by this store.
  * @template StateExt any extension to state from store enhancers
  */
-export interface Store<
-  S = any,
-  A extends Action = AnyAction,
-  StateExt = {}
-> {
+export interface Store<S = any, A extends Action = AnyAction, StateExt = {}> {
   /**
    * Dispatches an action. It is the only way to trigger a state change.
    *
