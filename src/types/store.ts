@@ -2,20 +2,6 @@ import { Action, AnyAction } from './actions'
 import { Reducer } from './reducers'
 
 /**
- * Extend the state
- *
- * This is used by store enhancers and store creators to extend state.
- * If there is no state extension, it just returns the state, as is, otherwise
- * it returns the state joined with its extension.
- *
- * Reference for future devs:
- * https://github.com/microsoft/TypeScript/issues/31751#issuecomment-498526919
- */
-export type ExtendState<State, Extension> = [Extension] extends [never]
-  ? State
-  : State & Extension
-
-/**
  * Internal "virtual" symbol used to make the `CombinedState` type unique.
  */
 declare const $CombinedState: unique symbol
@@ -125,7 +111,7 @@ export type Observer<T> = {
 export interface Store<
   S = any,
   A extends Action = AnyAction,
-  StateExt = never
+  StateExt = {}
 > {
   /**
    * Dispatches an action. It is the only way to trigger a state change.
@@ -160,7 +146,7 @@ export interface Store<
    *
    * @returns The current state tree of your application.
    */
-  getState(): ExtendState<S, StateExt>
+  getState(): S & StateExt
 
   /**
    * Adds a change listener. It will be called any time an action is
@@ -205,7 +191,7 @@ export interface Store<
    * For more information, see the observable proposal:
    * https://github.com/tc39/proposal-observable
    */
-  [Symbol.observable](): Observable<ExtendState<S, StateExt>>
+  [Symbol.observable](): Observable<S & StateExt>
 }
 
 /**
@@ -256,10 +242,10 @@ export interface StoreCreator {
  * @template Ext Store extension that is mixed into the Store type.
  * @template StateExt State extension that is mixed into the state type.
  */
-export type StoreEnhancer<Ext = {}, StateExt = never> = (
+export type StoreEnhancer<Ext = {}, StateExt = {}> = (
   next: StoreEnhancerStoreCreator
 ) => StoreEnhancerStoreCreator<Ext, StateExt>
-export type StoreEnhancerStoreCreator<Ext = {}, StateExt = never> = <
+export type StoreEnhancerStoreCreator<Ext = {}, StateExt = {}> = <
   S = any,
   A extends Action = AnyAction
 >(
