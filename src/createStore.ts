@@ -45,7 +45,7 @@ export default function createStore<
 >(
   reducer: Reducer<S, A>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<S & StateExt, A> & Ext
+): Store<S, A, StateExt> & Ext
 export default function createStore<
   S,
   A extends Action,
@@ -55,7 +55,7 @@ export default function createStore<
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<S & StateExt, A> & Ext
+): Store<S, A, StateExt> & Ext
 export default function createStore<
   S,
   A extends Action,
@@ -65,7 +65,7 @@ export default function createStore<
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<S & StateExt, A> & Ext {
+): Store<S, A, StateExt> & Ext {
   if (
     (typeof preloadedState === 'function' && typeof enhancer === 'function') ||
     (typeof enhancer === 'function' && typeof arguments[3] === 'function')
@@ -90,7 +90,7 @@ export default function createStore<
     return enhancer(createStore)(
       reducer,
       preloadedState as PreloadedState<S>
-    ) as Store<S & StateExt, A> & Ext
+    ) as Store<S, A, StateExt> & Ext
   }
 
   if (typeof reducer !== 'function') {
@@ -332,5 +332,5 @@ export default function createStore<
     getState,
     replaceReducer,
     [$$observable]: observable
-  } as unknown) as Store<S & StateExt, A> & Ext
+  } as unknown) as Store<S, A, StateExt> & Ext
 }
