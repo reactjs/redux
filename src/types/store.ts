@@ -7,6 +7,20 @@ import { Reducer } from './reducers'
 declare const $CombinedState: unique symbol
 
 /**
+ * Extend the state
+ *
+ * This is used by store enhancers and store creators to extend state.
+ * If there is no state extension, it just returns the state, as is, otherwise
+ * it returns the state joined with its extension.
+ *
+ * Reference for future devs:
+ * https://github.com/microsoft/TypeScript/issues/31751#issuecomment-498526919
+ */
+export type ExtendState<State, Extension> = [Extension] extends [never]
+  ? State
+  : State & Extension
+
+/**
  * State base type for reducers created with `combineReducers()`.
  *
  * This type allows the `createStore()` method to infer which levels of the
@@ -111,7 +125,7 @@ export type Observer<T> = {
 export interface Store<
   S = any,
   A extends Action = AnyAction,
-  StateExt = {}
+  StateExt = never
 > {
   /**
    * Dispatches an action. It is the only way to trigger a state change.
@@ -146,7 +160,7 @@ export interface Store<
    *
    * @returns The current state tree of your application.
    */
-  getState(): S & StateExt
+  getState(): ExtendState<S, StateExt>
 
   /**
    * Adds a change listener. It will be called any time an action is
@@ -193,7 +207,7 @@ export interface Store<
    * For more information, see the observable proposal:
    * https://github.com/tc39/proposal-observable
    */
-  [Symbol.observable](): Observable<S & StateExt>
+  [Symbol.observable](): Observable<ExtendState<S, StateExt>>
 }
 
 /**

@@ -39,12 +39,19 @@ import isPlainObject from './utils/isPlainObject'
  */
 export default function createStore<
   S,
+  A extends Action
+>(
+  reducer: Reducer<S, A>,
+  preloadedState?: PreloadedState<S>
+): Store<S, A>
+export default function createStore<
+  S,
   A extends Action,
   Ext,
   StateExt
 >(
   reducer: Reducer<S, A>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  enhancer: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
 export default function createStore<
   S,
@@ -53,8 +60,8 @@ export default function createStore<
   StateExt
 >(
   reducer: Reducer<S, A>,
-  preloadedState?: PreloadedState<S>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  preloadedState: PreloadedState<S>,
+  enhancer: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
 export default function createStore<
   S,

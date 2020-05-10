@@ -18,7 +18,7 @@ firstState.bar.value
 // typings:expect-error
 firstState.baz.value
 
-store.replaceReducer(combineReducers({ baz }) as unknown as Reducer<CombinedState<{ bar: { value: string } }>>) // returns ->  { baz: { value: 'baz' }}
+store.replaceReducer(combineReducers({ baz }) as unknown as Reducer<CombinedState<{ bar: { value: string } }>>)
 const nextStore = store as unknown as Store<CombinedState<{ baz: { value: string } }>>
 
 const nextState = nextStore.getState()
