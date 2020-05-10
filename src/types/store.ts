@@ -197,9 +197,7 @@ export interface Store<
    *
    * @param nextReducer The reducer for the store to use instead.
    */
-  replaceReducer(
-    nextReducer: Reducer<S, A>
-  ): void
+  replaceReducer(nextReducer: Reducer<S, A>): void
 
   /**
    * Interoperability point for observable/reactive libraries.

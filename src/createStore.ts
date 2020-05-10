@@ -37,38 +37,20 @@ import isPlainObject from './utils/isPlainObject'
  * @returns A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-export default function createStore<
-  S,
-  A extends Action
->(
+export default function createStore<S, A extends Action>(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>
 ): Store<S, A>
-export default function createStore<
-  S,
-  A extends Action,
-  Ext,
-  StateExt
->(
+export default function createStore<S, A extends Action, Ext, StateExt>(
   reducer: Reducer<S, A>,
   enhancer: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
-export default function createStore<
-  S,
-  A extends Action,
-  Ext,
-  StateExt
->(
+export default function createStore<S, A extends Action, Ext, StateExt>(
   reducer: Reducer<S, A>,
   preloadedState: PreloadedState<S>,
   enhancer: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
-export default function createStore<
-  S,
-  A extends Action,
-  Ext,
-  StateExt
->(
+export default function createStore<S, A extends Action, Ext, StateExt>(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
@@ -272,9 +254,7 @@ export default function createStore<
    *
    * @param nextReducer The reducer for the store to use instead.
    */
-  function replaceReducer(
-    nextReducer: Reducer<S, A>
-  ): void {
+  function replaceReducer(nextReducer: Reducer<S, A>): void {
     if (typeof nextReducer !== 'function') {
       throw new Error('Expected the nextReducer to be a function.')
     }

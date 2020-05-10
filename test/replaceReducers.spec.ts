@@ -1,4 +1,11 @@
-import { createStore, combineReducers, AnyAction, Reducer, CombinedState, Store } from '..'
+import {
+  createStore,
+  combineReducers,
+  AnyAction,
+  Reducer,
+  CombinedState,
+  Store
+} from '..'
 
 describe('replaceReducers test', () => {
   it('replaces the reducer', () => {
@@ -11,11 +18,13 @@ describe('replaceReducers test', () => {
       return action
     })
 
-    store.dispatch({ type: 'INIT' });
-    expect(store.getState().type).toBe('INIT');
+    store.dispatch({ type: 'INIT' })
+    expect(store.getState().type).toBe('INIT')
 
-    store.replaceReducer(nextReducer as unknown as Reducer<AnyAction>)
-    const nextStore = store as unknown as Store<CombinedState<{ foo: unknown; bar: unknown; }>>;
+    store.replaceReducer((nextReducer as unknown) as Reducer<AnyAction>)
+    const nextStore = (store as unknown) as Store<
+      CombinedState<{ foo: unknown; bar: unknown }>
+    >
 
     expect(nextStore.getState().foo).toBe(1)
     expect(nextStore.getState().bar).toBe(2)
