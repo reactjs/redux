@@ -220,14 +220,18 @@ export interface Store<
  * @template StateExt State extension that is mixed into the state type.
  */
 export interface StoreCreator {
+  <S, A extends Action>(
+    reducer: Reducer<S, A>,
+    preloadedState?: PreloadedState<S>
+  ): Store<S, A>
   <S, A extends Action, Ext = {}, StateExt = {}>(
     reducer: Reducer<S, A>,
-    enhancer?: StoreEnhancer<Ext, StateExt>
+    enhancer: StoreEnhancer<Ext, StateExt>
   ): Store<S, A, StateExt> & Ext
   <S, A extends Action, Ext, StateExt>(
     reducer: Reducer<S, A>,
-    preloadedState?: PreloadedState<S>,
-    enhancer?: StoreEnhancer<Ext, StateExt>
+    preloadedState: PreloadedState<S>,
+    enhancer: StoreEnhancer<Ext, StateExt>
   ): Store<S, A, StateExt> & Ext
 }
 
