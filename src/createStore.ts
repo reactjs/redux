@@ -110,7 +110,7 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
    *
    * @returns The current state tree of your application.
    */
-  function getState(): S {
+  function getState(): S & StateExt {
     if (isDispatching) {
       throw new Error(
         'You may not call store.getState() while the reducer is executing. ' +
@@ -119,7 +119,7 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
       )
     }
 
-    return currentState as S
+    return currentState as S & StateExt
   }
 
   /**
