@@ -5,8 +5,7 @@ import {
   Action,
   StoreEnhancer,
   Unsubscribe,
-  Observer,
-  ExtendState
+  Observer
 } from '../..'
 import 'symbol-observable'
 
@@ -14,41 +13,6 @@ type State = {
   a: 'a'
   b: {
     c: 'c'
-    d: 'd'
-  }
-}
-
-/* extended state */
-const noExtend: ExtendState<State, never> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  }
-}
-// typings:expect-error
-const noExtendError: ExtendState<State, never> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  e: 'oops'
-}
-
-const yesExtend: ExtendState<State, { yes: 'we can' }> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  yes: 'we can'
-}
-// typings:expect-error
-const yesExtendError: ExtendState<State, { yes: 'we can' }> = {
-  a: 'a',
-  b: {
-    c: 'c',
     d: 'd'
   }
 }

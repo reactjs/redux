@@ -1,5 +1,4 @@
 import { StoreEnhancer, Action, AnyAction, Reducer, createStore, StoreEnhancerStoreCreator, Store } from '../..'
-import { ExtendState } from '../../src'
 
 interface State {
   someField: 'string'
@@ -14,9 +13,9 @@ function dispatchExtension() {
 
   const enhancer: StoreEnhancer<{
     dispatch: PromiseDispatch
-  }> = <NextExt, NextStateExt>(createStore: StoreEnhancerStoreCreator<NextExt, NextStateExt>) => <S, A extends Action = AnyAction>(
-    reducer: Reducer<S, A>,
-    preloadedState?: any
+  }> = createStore => (
+    reducer,
+    preloadedState
   ) => {
     const store = createStore(reducer, preloadedState)
 
@@ -26,7 +25,7 @@ function dispatchExtension() {
       store.replaceReducer(nextReducer);
       return newStore;
     }
-    
+
     const newStore = {
       ...store,
       dispatch: (action: any) => {
@@ -96,11 +95,22 @@ function stateExtension() {
  */
 function extraMethods() {
   const enhancer: StoreEnhancer<{ method(): string }> = createStore => (
-    ...args
+    reducer,
+    preloadedState,
   ) => {
-    const store = createStore(...args)
-    store.method = () => 'foo'
-    return store
+    const store = createStore(reducer, preloadedState)
+
+    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+      store.replaceReducer(nextReducer)
+      return newStore
+    }
+
+    const newStore = {
+      ...store,
+      replaceReducer,
+      method: () => 'foo'
+    }
+    return newStore
   }
 
   const store = createStore(reducer, enhancer)
@@ -139,7 +149,19 @@ function replaceReducerExtender() {
           extraField: 'extra'
         }
       : undefined
-    return createStore(wrappedReducer, wrappedPreloadedState)
+
+    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+      store.replaceReducer(nextReducer)
+      return newStore
+    }
+
+    const store = createStore(wrappedReducer, wrappedPreloadedState)
+    const newStore = {
+      ...store,
+      replaceReducer,
+      method: () => 'foo'
+    }
+    return newStore
   }
 
   const store = createStore(reducer, enhancer)
