@@ -13,17 +13,14 @@ function dispatchExtension() {
 
   const enhancer: StoreEnhancer<{
     dispatch: PromiseDispatch
-  }> = createStore => (
-    reducer,
-    preloadedState
-  ) => {
+  }> = createStore => (reducer, preloadedState) => {
     const store = createStore(reducer, preloadedState)
 
     function replaceReducer<NewState, NewActions extends Action>(
       nextReducer: Reducer<NewState, NewActions>
     ) {
-      store.replaceReducer(nextReducer);
-      return newStore;
+      store.replaceReducer(nextReducer)
+      return newStore
     }
 
     const newStore = {
@@ -38,7 +35,7 @@ function dispatchExtension() {
       },
       replaceReducer
     }
-    return newStore;
+    return newStore
   }
 
   const store = createStore(reducer, enhancer)
@@ -96,11 +93,13 @@ function stateExtension() {
 function extraMethods() {
   const enhancer: StoreEnhancer<{ method(): string }> = createStore => (
     reducer,
-    preloadedState,
+    preloadedState
   ) => {
     const store = createStore(reducer, preloadedState)
 
-    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+    function replaceReducer<NewState, NewActions extends Action>(
+      nextReducer: Reducer<NewState, NewActions>
+    ) {
       store.replaceReducer(nextReducer)
       return newStore
     }
@@ -150,7 +149,9 @@ function replaceReducerExtender() {
         }
       : undefined
 
-    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+    function replaceReducer<NewState, NewActions extends Action>(
+      nextReducer: Reducer<NewState, NewActions>
+    ) {
       store.replaceReducer(nextReducer)
       return newStore
     }
@@ -330,19 +331,24 @@ function finalHelmersonExample() {
 
 function composedEnhancers() {
   interface State {
-    someState: string;
+    someState: string
   }
   const reducer: Reducer<State> = null as any
 
   interface Ext1 {
-    enhancer1: string;
+    enhancer1: string
   }
   interface Ext2 {
-    enhancer2: number;
+    enhancer2: number
   }
 
-  const enhancer1: StoreEnhancer<Ext1> = (createStore) => (reducer, preloadedState) => {
-    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+  const enhancer1: StoreEnhancer<Ext1> = createStore => (
+    reducer,
+    preloadedState
+  ) => {
+    function replaceReducer<NewState, NewActions extends Action>(
+      nextReducer: Reducer<NewState, NewActions>
+    ) {
       store.replaceReducer(nextReducer)
       return newStore
     }
@@ -355,8 +361,13 @@ function composedEnhancers() {
     return newStore
   }
 
-  const enhancer2: StoreEnhancer<Ext2> = (createStore) => (reducer, preloadedState) => {
-    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+  const enhancer2: StoreEnhancer<Ext2> = createStore => (
+    reducer,
+    preloadedState
+  ) => {
+    function replaceReducer<NewState, NewActions extends Action>(
+      nextReducer: Reducer<NewState, NewActions>
+    ) {
       store.replaceReducer(nextReducer)
       return newStore
     }
@@ -369,7 +380,9 @@ function composedEnhancers() {
     return newStore
   }
 
-  const enhancedStore = createStore(reducer, (createStore) => enhancer2(enhancer1(createStore)));
+  const enhancedStore = createStore(reducer, createStore =>
+    enhancer2(enhancer1(createStore))
+  )
   enhancedStore.enhancer1
   enhancedStore.enhancer2
   // typings:expect-error
