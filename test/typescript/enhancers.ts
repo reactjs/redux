@@ -1,4 +1,4 @@
-import { StoreEnhancer, Action, AnyAction, Reducer, createStore, StoreEnhancerStoreCreator, Store } from '../..'
+import { StoreEnhancer, Action, AnyAction, Reducer, createStore } from '../..'
 
 interface State {
   someField: 'string'
@@ -326,4 +326,52 @@ function finalHelmersonExample() {
   newStore.getState().whatever
   // typings:expect-error
   newStore.getState().wrongField
+}
+
+function composedEnhancers() {
+  interface State {
+    someState: string;
+  }
+  const reducer: Reducer<State> = null as any
+
+  interface Ext1 {
+    enhancer1: string;
+  }
+  interface Ext2 {
+    enhancer2: number;
+  }
+
+  const enhancer1: StoreEnhancer<Ext1> = (createStore) => (reducer, preloadedState) => {
+    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+      store.replaceReducer(nextReducer)
+      return newStore
+    }
+    const store = createStore(reducer, preloadedState)
+    const newStore = {
+      ...store,
+      replaceReducer,
+      enhancer1: 'foo'
+    }
+    return newStore
+  }
+
+  const enhancer2: StoreEnhancer<Ext2> = (createStore) => (reducer, preloadedState) => {
+    function replaceReducer<NewState, NewActions extends Action>(nextReducer: Reducer<NewState, NewActions>) {
+      store.replaceReducer(nextReducer)
+      return newStore
+    }
+    const store = createStore(reducer, preloadedState)
+    const newStore = {
+      ...store,
+      replaceReducer,
+      enhancer2: 5
+    }
+    return newStore
+  }
+
+  const enhancedStore = createStore(reducer, (createStore) => enhancer2(enhancer1(createStore)));
+  enhancedStore.enhancer1
+  enhancedStore.enhancer2
+  // typings:expect-error
+  enhancedStore.enhancer3
 }
