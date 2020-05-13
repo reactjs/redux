@@ -5,7 +5,8 @@ import {
   PreloadedState,
   StoreEnhancer,
   Dispatch,
-  Observer
+  Observer,
+  ExtendState
 } from './types/store'
 import { Action } from './types/actions'
 import { Reducer } from './types/reducers'
@@ -37,20 +38,31 @@ import isPlainObject from './utils/isPlainObject'
  * @returns A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-export default function createStore<S, A extends Action>(
+export default function createStore<
+  S,
+  A extends Action,
+  Ext = {},
+  StateExt = never
+>(
   reducer: Reducer<S, A>,
-  preloadedState?: PreloadedState<S>
-): Store<S, A>
-export default function createStore<S, A extends Action, Ext, StateExt>(
-  reducer: Reducer<S, A>,
-  enhancer: StoreEnhancer<Ext, StateExt>
+  enhancer?: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
-export default function createStore<S, A extends Action, Ext, StateExt>(
+export default function createStore<
+  S,
+  A extends Action,
+  Ext = {},
+  StateExt = never
+>(
   reducer: Reducer<S, A>,
-  preloadedState: PreloadedState<S>,
-  enhancer: StoreEnhancer<Ext, StateExt>
+  preloadedState?: PreloadedState<S>,
+  enhancer?: StoreEnhancer<Ext, StateExt>
 ): Store<S, A, StateExt> & Ext
-export default function createStore<S, A extends Action, Ext, StateExt>(
+export default function createStore<
+  S,
+  A extends Action,
+  Ext = {},
+  StateExt = never
+>(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
@@ -110,7 +122,7 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
    *
    * @returns The current state tree of your application.
    */
-  function getState(): S & StateExt {
+  function getState(): ExtendState<S, StateExt> {
     if (isDispatching) {
       throw new Error(
         'You may not call store.getState() while the reducer is executing. ' +
@@ -119,7 +131,7 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
       )
     }
 
-    return currentState as S & StateExt
+    return currentState as ExtendState<S, StateExt>
   }
 
   /**
@@ -291,7 +303,9 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
         }
 
         function observeState() {
-          const observerAsObserver = observer as Observer<S>
+          const observerAsObserver = observer as Observer<
+            ExtendState<S, StateExt>
+          >
           if (observerAsObserver.next) {
             observerAsObserver.next(getState())
           }
@@ -313,11 +327,12 @@ export default function createStore<S, A extends Action, Ext, StateExt>(
   // the initial state tree.
   dispatch({ type: ActionTypes.INIT } as A)
 
-  return ({
+  const store = ({
     dispatch: dispatch as Dispatch<A>,
     subscribe,
     getState,
     replaceReducer,
     [$$observable]: observable
   } as unknown) as Store<S, A, StateExt> & Ext
+  return store
 }

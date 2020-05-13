@@ -5,7 +5,8 @@ import {
   Action,
   StoreEnhancer,
   Unsubscribe,
-  Observer
+  Observer,
+  ExtendState
 } from '../..'
 import 'symbol-observable'
 
@@ -13,6 +14,41 @@ type State = {
   a: 'a'
   b: {
     c: 'c'
+    d: 'd'
+  }
+}
+
+/* extended state */
+const noExtend: ExtendState<State, never> = {
+  a: 'a',
+  b: {
+    c: 'c',
+    d: 'd'
+  }
+}
+// typings:expect-error
+const noExtendError: ExtendState<State, never> = {
+  a: 'a',
+  b: {
+    c: 'c',
+    d: 'd'
+  },
+  e: 'oops'
+}
+
+const yesExtend: ExtendState<State, { yes: 'we can' }> = {
+  a: 'a',
+  b: {
+    c: 'c',
+    d: 'd'
+  },
+  yes: 'we can'
+}
+// typings:expect-error
+const yesExtendError: ExtendState<State, { yes: 'we can' }> = {
+  a: 'a',
+  b: {
+    c: 'c',
     d: 'd'
   }
 }
@@ -84,9 +120,9 @@ const storeWithActionReducerAndBadPreloadedState = createStore(
 
 const enhancer: StoreEnhancer = next => next
 
-const storeWithSpecificEnhancer = createStore(reducer, enhancer)
+const storeWithSpecificEnhancer: Store<State> = createStore(reducer, enhancer)
 
-const storeWithPreloadedStateAndEnhancer = createStore(
+const storeWithPreloadedStateAndEnhancer: Store<State> = createStore(
   reducer,
   {
     a: 'a',
