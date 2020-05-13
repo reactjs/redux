@@ -1,4 +1,5 @@
-import { StoreEnhancer, Action, AnyAction, Reducer, createStore } from '../..'
+import { StoreEnhancer, Action, AnyAction, Reducer, createStore, StoreEnhancerStoreCreator, Store } from '../..'
+import { ExtendState } from '../../src'
 
 interface State {
   someField: 'string'
@@ -13,12 +14,20 @@ function dispatchExtension() {
 
   const enhancer: StoreEnhancer<{
     dispatch: PromiseDispatch
-  }> = createStore => <S, A extends Action = AnyAction>(
+  }> = <NextExt, NextStateExt>(createStore: StoreEnhancerStoreCreator<NextExt, NextStateExt>) => <S, A extends Action = AnyAction>(
     reducer: Reducer<S, A>,
     preloadedState?: any
   ) => {
     const store = createStore(reducer, preloadedState)
-    return {
+
+    function replaceReducer<NewState, NewActions extends Action>(
+      nextReducer: Reducer<NewState, NewActions>
+    ) {
+      store.replaceReducer(nextReducer);
+      return newStore;
+    }
+    
+    const newStore = {
       ...store,
       dispatch: (action: any) => {
         if (action.type) {
@@ -27,8 +36,10 @@ function dispatchExtension() {
           action.then(store.dispatch)
         }
         return action
-      }
+      },
+      replaceReducer
     }
+    return newStore;
   }
 
   const store = createStore(reducer, enhancer)
