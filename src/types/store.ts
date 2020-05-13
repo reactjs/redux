@@ -218,7 +218,7 @@ export interface StoreCreator {
   <S, A extends Action, Ext = {}, StateExt = {}>(
     reducer: Reducer<S, A>,
     preloadedState?: PreloadedState<S>,
-    enhancer?: StoreEnhancer<Ext>
+    enhancer?: StoreEnhancer<Ext, StateExt>
   ): Store<S & StateExt, A, StateExt, Ext> & Ext
 }
 

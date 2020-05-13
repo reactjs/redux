@@ -50,7 +50,7 @@ export default function createStore<
   S,
   A extends Action,
   Ext = {},
-  StateExt = never
+  StateExt = {}
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
@@ -60,7 +60,7 @@ export default function createStore<
   S,
   A extends Action,
   Ext = {},
-  StateExt = never
+  StateExt = {}
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
