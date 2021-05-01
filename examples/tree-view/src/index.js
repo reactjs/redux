@@ -1,17 +1,14 @@
 import React from 'react'
-import { render } from 'react-dom'
-import { createStore } from 'redux'
+import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import reducer from './reducers'
-import generateTree from './generateTree'
-import Node from './containers/Node'
+import Node from './nodes/Node'
+import { store } from './app/store'
 
-const tree = generateTree()
-const store = createStore(reducer, tree)
-
-render(
-  <Provider store={store}>
-    <Node id={0} />
-  </Provider>,
+ReactDOM.render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <Node id={0}></Node>
+    </Provider>
+  </React.StrictMode>,
   document.getElementById('root')
 )
