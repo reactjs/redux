@@ -129,8 +129,7 @@ export type Observer<T> = {
 export interface Store<
   S = any,
   A extends Action = AnyAction,
-  StateExt = never,
-  Ext = {}
+  StateExt = never
 > {
   /**
    * Dispatches an action. It is the only way to trigger a state change.
@@ -165,7 +164,7 @@ export interface Store<
    *
    * @returns The current state tree of your application.
    */
-  getState(): S
+  getState(): ExtendState<S, StateExt>
 
   /**
    * Adds a change listener. It will be called any time an action is
@@ -202,9 +201,7 @@ export interface Store<
    *
    * @param nextReducer The reducer for the store to use instead.
    */
-  replaceReducer<NewState, NewActions extends Action>(
-    nextReducer: Reducer<NewState, NewActions>
-  ): Store<ExtendState<NewState, StateExt>, NewActions, StateExt, Ext> & Ext
+  replaceReducer(nextReducer: Reducer<S, A>): void
 
   /**
    * Interoperability point for observable/reactive libraries.
@@ -212,7 +209,7 @@ export interface Store<
    * For more information, see the observable proposal:
    * https://github.com/tc39/proposal-observable
    */
-  [Symbol.observable](): Observable<S>
+  [Symbol.observable](): Observable<ExtendState<S, StateExt>>
 }
 
 /**
@@ -230,12 +227,12 @@ export interface StoreCreator {
   <S, A extends Action, Ext = {}, StateExt = never>(
     reducer: Reducer<S, A>,
     enhancer?: StoreEnhancer<Ext, StateExt>
-  ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+  ): Store<S, A, StateExt> & Ext
   <S, A extends Action, Ext = {}, StateExt = never>(
     reducer: Reducer<S, A>,
     preloadedState?: PreloadedState<S>,
     enhancer?: StoreEnhancer<Ext>
-  ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+  ): Store<S, A, StateExt> & Ext
 }
 
 /**
@@ -268,4 +265,4 @@ export type StoreEnhancerStoreCreator<Ext = {}, StateExt = never> = <
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>
-) => Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+) => Store<S, A, StateExt> & Ext
