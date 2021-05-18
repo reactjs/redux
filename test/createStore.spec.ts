@@ -38,9 +38,9 @@ describe('createStore', () => {
   it('throws if reducer is not a function', () => {
     expect(() => createStore(undefined)).toThrow()
 
-    expect(() => createStore(('test' as unknown) as Reducer)).toThrow()
+    expect(() => createStore('test' as unknown as Reducer)).toThrow()
 
-    expect(() => createStore(({} as unknown) as Reducer)).toThrow()
+    expect(() => createStore({} as unknown as Reducer)).toThrow()
 
     expect(() => createStore(() => {})).not.toThrow()
   })
@@ -521,6 +521,32 @@ describe('createStore', () => {
     )
   })
 
+  it('throws an error that correctly describes the type of item dispatched', () => {
+    const store = createStore(reducers.todos)
+    // @ts-ignore
+    expect(() => store.dispatch(Promise.resolve(42))).toThrow(
+      /the actual type was: 'Promise'/
+    )
+
+    // @ts-ignore
+    expect(() => store.dispatch(() => {})).toThrow(
+      /the actual type was: 'function'/
+    )
+
+    // @ts-ignore
+    expect(() => store.dispatch(new Date())).toThrow(
+      /the actual type was: 'date'/
+    )
+
+    // @ts-ignore
+    expect(() => store.dispatch(null)).toThrow(/the actual type was: 'null'/)
+
+    // @ts-ignore
+    expect(() => store.dispatch(undefined)).toThrow(
+      /the actual type was: 'undefined'/
+    )
+  })
+
   it('throws if action type is undefined', () => {
     const store = createStore(reducers.todos)
     expect(() => store.dispatch({ type: undefined })).toThrow(
@@ -538,16 +564,18 @@ describe('createStore', () => {
 
   it('accepts enhancer as the third argument', () => {
     const emptyArray = []
-    const spyEnhancer = vanillaCreateStore => (...args) => {
-      expect(args[0]).toBe(reducers.todos)
-      expect(args[1]).toBe(emptyArray)
-      expect(args.length).toBe(2)
-      const vanillaStore = vanillaCreateStore(...args)
-      return {
-        ...vanillaStore,
-        dispatch: jest.fn(vanillaStore.dispatch)
+    const spyEnhancer =
+      vanillaCreateStore =>
+      (...args) => {
+        expect(args[0]).toBe(reducers.todos)
+        expect(args[1]).toBe(emptyArray)
+        expect(args.length).toBe(2)
+        const vanillaStore = vanillaCreateStore(...args)
+        return {
+          ...vanillaStore,
+          dispatch: jest.fn(vanillaStore.dispatch)
+        }
       }
-    }
 
     const store = createStore(reducers.todos, emptyArray, spyEnhancer)
     const action = addTodo('Hello')
@@ -562,16 +590,18 @@ describe('createStore', () => {
   })
 
   it('accepts enhancer as the second argument if initial state is missing', () => {
-    const spyEnhancer = vanillaCreateStore => (...args) => {
-      expect(args[0]).toBe(reducers.todos)
-      expect(args[1]).toBe(undefined)
-      expect(args.length).toBe(2)
-      const vanillaStore = vanillaCreateStore(...args)
-      return {
-        ...vanillaStore,
-        dispatch: jest.fn(vanillaStore.dispatch)
+    const spyEnhancer =
+      vanillaCreateStore =>
+      (...args) => {
+        expect(args[0]).toBe(reducers.todos)
+        expect(args[1]).toBe(undefined)
+        expect(args.length).toBe(2)
+        const vanillaStore = vanillaCreateStore(...args)
+        return {
+          ...vanillaStore,
+          dispatch: jest.fn(vanillaStore.dispatch)
+        }
       }
-    }
 
     const store = createStore(reducers.todos, spyEnhancer)
     const action = addTodo('Hello')
@@ -587,21 +617,17 @@ describe('createStore', () => {
 
   it('throws if enhancer is neither undefined nor a function', () => {
     expect(() =>
-      createStore(reducers.todos, undefined, ({} as unknown) as StoreEnhancer)
+      createStore(reducers.todos, undefined, {} as unknown as StoreEnhancer)
     ).toThrow()
 
     expect(() =>
-      createStore(reducers.todos, undefined, ([] as unknown) as StoreEnhancer)
+      createStore(reducers.todos, undefined, [] as unknown as StoreEnhancer)
     ).toThrow()
 
     expect(() => createStore(reducers.todos, undefined, null)).toThrow()
 
     expect(() =>
-      createStore(
-        reducers.todos,
-        undefined,
-        (false as unknown) as StoreEnhancer
-      )
+      createStore(reducers.todos, undefined, false as unknown as StoreEnhancer)
     ).toThrow()
 
     expect(() =>
@@ -634,7 +660,7 @@ describe('createStore', () => {
 
     expect(() => store.subscribe(undefined)).toThrow()
 
-    expect(() => store.subscribe(('' as unknown) as () => void)).toThrow()
+    expect(() => store.subscribe('' as unknown as () => void)).toThrow()
 
     expect(() => store.subscribe(null)).toThrow()
 
@@ -666,15 +692,27 @@ describe('createStore', () => {
 
         expect(function () {
           obs.subscribe()
-        }).toThrowError(new TypeError('Expected the observer to be an object.'))
+        }).toThrowError(
+          new TypeError(
+            `Expected the observer to be an object. Instead, received: 'undefined'`
+          )
+        )
 
         expect(function () {
           obs.subscribe(null)
-        }).toThrowError(new TypeError('Expected the observer to be an object.'))
+        }).toThrowError(
+          new TypeError(
+            `Expected the observer to be an object. Instead, received: 'null'`
+          )
+        )
 
         expect(function () {
           obs.subscribe(() => {})
-        }).toThrowError(new TypeError('Expected the observer to be an object.'))
+        }).toThrowError(
+          new TypeError(
+            `Expected the observer to be an object. Instead, received: 'function'`
+          )
+        )
 
         expect(function () {
           obs.subscribe({})
@@ -807,7 +845,7 @@ describe('createStore', () => {
     const dummyEnhancer = f => f
     expect(() =>
       // use a fake pre-loaded state to get a valid createStore signature
-      createStore(rootReducer, (dummyEnhancer as unknown) as {}, dummyEnhancer)
+      createStore(rootReducer, dummyEnhancer as unknown as {}, dummyEnhancer)
     ).toThrow()
   })
 

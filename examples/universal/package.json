@@ -12,8 +12,8 @@
     "express": "^4.16.4",
     "prop-types": "^15.7.2",
     "qs": "^6.7.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-redux": "^7.0.2",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
@@ -26,8 +26,8 @@
     "babel-preset-react": "^6.3.13",
     "babel-preset-react-hmre": "^1.1.1",
     "babel-runtime": "^6.26.0",
-    "webpack": "^4.30.0",
-    "webpack-dev-middleware": "^3.6.2",
-    "webpack-hot-middleware": "^2.24.3"
+    "webpack": "^4.43.0",
+    "webpack-dev-middleware": "^3.7.2",
+    "webpack-hot-middleware": "^2.25.0"
   }
 }

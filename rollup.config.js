@@ -1,5 +1,5 @@
 import nodeResolve from '@rollup/plugin-node-resolve'
-import babel from 'rollup-plugin-babel'
+import babel from '@rollup/plugin-babel'
 import replace from '@rollup/plugin-replace'
 import typescript from 'rollup-plugin-typescript2'
 import { terser } from 'rollup-plugin-terser'
@@ -14,12 +14,12 @@ const babelRuntimeVersion = pkg.dependencies['@babel/runtime'].replace(
   ''
 )
 
-const makeExternalPredicate = (externalArr) => {
+const makeExternalPredicate = externalArr => {
   if (externalArr.length === 0) {
     return () => false
   }
   const pattern = new RegExp(`^(${externalArr.join('|')})($|/)`)
-  return (id) => pattern.test(id)
+  return id => pattern.test(id)
 }
 
 export default [
@@ -29,21 +29,22 @@ export default [
     output: { file: 'lib/redux.js', format: 'cjs', indent: false },
     external: makeExternalPredicate([
       ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {}),
+      ...Object.keys(pkg.peerDependencies || {})
     ]),
     plugins: [
       nodeResolve({
-        extensions,
+        extensions
       }),
       typescript({ useTsconfigDeclarationDir: true }),
       babel({
         extensions,
         plugins: [
           ['@babel/plugin-transform-runtime', { version: babelRuntimeVersion }],
+          ['./scripts/mangleErrors.js', { minify: false }]
         ],
-        runtimeHelpers: true,
-      }),
-    ],
+        babelHelpers: 'runtime'
+      })
+    ]
   },
 
   // ES
@@ -52,11 +53,11 @@ export default [
     output: { file: 'es/redux.js', format: 'es', indent: false },
     external: makeExternalPredicate([
       ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {}),
+      ...Object.keys(pkg.peerDependencies || {})
     ]),
     plugins: [
       nodeResolve({
-        extensions,
+        extensions
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
       babel({
@@ -64,12 +65,13 @@ export default [
         plugins: [
           [
             '@babel/plugin-transform-runtime',
-            { version: babelRuntimeVersion, useESModules: true },
+            { version: babelRuntimeVersion, useESModules: true }
           ],
+          ['./scripts/mangleErrors.js', { minify: false }]
         ],
-        runtimeHelpers: true,
-      }),
-    ],
+        babelHelpers: 'runtime'
+      })
+    ]
   },
 
   // ES for Browsers
@@ -78,25 +80,29 @@ export default [
     output: { file: 'es/redux.mjs', format: 'es', indent: false },
     plugins: [
       nodeResolve({
-        extensions,
+        extensions
       }),
       replace({
-        'process.env.NODE_ENV': JSON.stringify('production'),
+        preventAssignment: true,
+        'process.env.NODE_ENV': JSON.stringify('production')
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
       babel({
         extensions,
         exclude: 'node_modules/**',
+        plugins: [['./scripts/mangleErrors.js', { minify: true }]],
+        skipPreflightCheck: true,
+        babelHelpers: 'bundled'
       }),
       terser({
         compress: {
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false,
-        },
-      }),
-    ],
+          warnings: false
+        }
+      })
+    ]
   },
 
   // UMD Development
@@ -106,21 +112,24 @@ export default [
       file: 'dist/redux.js',
       format: 'umd',
       name: 'Redux',
-      indent: false,
+      indent: false
     },
     plugins: [
       nodeResolve({
-        extensions,
+        extensions
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
       babel({
         extensions,
         exclude: 'node_modules/**',
+        plugins: [['./scripts/mangleErrors.js', { minify: false }]],
+        babelHelpers: 'bundled'
       }),
       replace({
-        'process.env.NODE_ENV': JSON.stringify('development'),
-      }),
-    ],
+        preventAssignment: true,
+        'process.env.NODE_ENV': JSON.stringify('development')
+      })
+    ]
   },
 
   // UMD Production
@@ -130,28 +139,32 @@ export default [
       file: 'dist/redux.min.js',
       format: 'umd',
       name: 'Redux',
-      indent: false,
+      indent: false
     },
     plugins: [
       nodeResolve({
-        extensions,
+        extensions
       }),
       typescript({ tsconfigOverride: noDeclarationFiles }),
       babel({
         extensions,
         exclude: 'node_modules/**',
+        plugins: [['./scripts/mangleErrors.js', { minify: true }]],
+        skipPreflightCheck: true,
+        babelHelpers: 'bundled'
       }),
       replace({
-        'process.env.NODE_ENV': JSON.stringify('production'),
+        preventAssignment: true,
+        'process.env.NODE_ENV': JSON.stringify('production')
       }),
       terser({
         compress: {
           pure_getters: true,
           unsafe: true,
           unsafe_comps: true,
-          warnings: false,
-        },
-      }),
-    ],
-  },
+          warnings: false
+        }
+      })
+    ]
+  }
 ]

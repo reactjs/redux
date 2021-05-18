@@ -49,14 +49,14 @@ describe('bindActionCreators', () => {
     // as this is testing against invalid values, we will cast to unknown and then back to ActionCreator<any>
     // in a typescript environment this test is unnecessary, but required in javascript
     const boundActionCreators = bindActionCreators(
-      ({
+      {
         ...actionCreators,
         foo: 42,
         bar: 'baz',
         wow: undefined,
         much: {},
         test: null
-      } as unknown) as ActionCreator<any>,
+      } as unknown as ActionCreator<any>,
       store.dispatch
     )
     expect(Object.keys(boundActionCreators)).toEqual(
@@ -77,8 +77,8 @@ describe('bindActionCreators', () => {
     expect(() => {
       bindActionCreators(undefined, store.dispatch)
     }).toThrow(
-      'bindActionCreators expected an object or a function, instead received undefined. ' +
-        'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?'
+      `bindActionCreators expected an object or a function, but instead received: 'undefined'. ` +
+        `Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?`
     )
   })
 
@@ -86,20 +86,20 @@ describe('bindActionCreators', () => {
     expect(() => {
       bindActionCreators(null, store.dispatch)
     }).toThrow(
-      'bindActionCreators expected an object or a function, instead received null. ' +
-        'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?'
+      `bindActionCreators expected an object or a function, but instead received: 'null'. ` +
+        `Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?`
     )
   })
 
   it('throws for a primitive actionCreator', () => {
     expect(() => {
       bindActionCreators(
-        ('string' as unknown) as ActionCreator<any>,
+        'string' as unknown as ActionCreator<any>,
         store.dispatch
       )
     }).toThrow(
-      'bindActionCreators expected an object or a function, instead received string. ' +
-        'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?'
+      `bindActionCreators expected an object or a function, but instead received: 'string'. ` +
+        `Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?`
     )
   })
 })

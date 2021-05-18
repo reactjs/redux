@@ -6,11 +6,11 @@ hide_title: true
 
 # Reducing Boilerplate
 
-Redux is in part [inspired by Flux](../introduction/PriorArt.md), and the most common complaint about Flux is how it makes you write a lot of boilerplate. In this recipe, we will consider how Redux lets us choose how verbose we'd like our code to be, depending on personal style, team preferences, longer term maintainability, and so on.
+Redux is in part [inspired by Flux](../understanding/history-and-design/PriorArt.md), and the most common complaint about Flux is how it makes you write a lot of boilerplate. In this recipe, we will consider how Redux lets us choose how verbose we'd like our code to be, depending on personal style, team preferences, longer term maintainability, and so on.
 
 ## Actions
 
-Actions are plain objects describing what happened in the app, and serve as the sole way to describe an intention to mutate the data. It's important that **actions being objects you have to dispatch is not boilerplate, but one of the [fundamental design choices](../introduction/ThreePrinciples.md) of Redux**.
+Actions are plain objects describing what happened in the app, and serve as the sole way to describe an intention to mutate the data. It's important that **actions being objects you have to dispatch is not boilerplate, but one of the [fundamental design choices](../understanding/thinking-in-redux/ThreePrinciples.md) of Redux**.
 
 There are frameworks claiming to be similar to Flux, but without a concept of action objects. In terms of being predictable, this is a step backwards from Flux or Redux. If there are no serializable plain object actions, it is impossible to record and replay user sessions, or to implement [hot reloading with time travel](https://www.youtube.com/watch?v=xsSnOQynTHs). If you'd rather modify data directly, you don't need Redux.
 
@@ -160,7 +160,7 @@ There are also utility libraries to aid in generating action creators, such as [
 
 ## Async Action Creators
 
-[Middleware](../Glossary.md#middleware) lets you inject custom logic that interprets every action object before it is dispatched. Async actions are the most common use case for middleware.
+[Middleware](../understanding/thinking-in-redux/Glossary.md#middleware) lets you inject custom logic that interprets every action object before it is dispatched. Async actions are the most common use case for middleware.
 
 Without any middleware, [`dispatch`](../api/Store.md#dispatchaction) only accepts a plain object, so we have to perform AJAX calls inside our components:
 
@@ -259,7 +259,7 @@ However, this quickly gets repetitive because different components request data 
 The simplest example of middleware is [redux-thunk](https://github.com/gaearon/redux-thunk). **“Thunk” middleware lets you write action creators as “thunks”, that is, functions returning functions.** This inverts the control: you will get `dispatch` as an argument, so you can write an action creator that dispatches many times.
 
 > ##### Note
-
+>
 > Thunk middleware is just one example of middleware. Middleware is not about “letting you dispatch functions”. It's about letting you dispatch anything that the particular middleware you use knows how to handle. Thunk middleware adds a specific behavior when you dispatch functions, but it really depends on the middleware you use.
 
 Consider the code above rewritten with [redux-thunk](https://github.com/gaearon/redux-thunk):

@@ -3,31 +3,39 @@ module.exports = {
     Introduction: [
       'introduction/getting-started',
       'introduction/installation',
-      'introduction/motivation',
       'introduction/core-concepts',
-      'introduction/three-principles',
-      'introduction/prior-art',
       'introduction/learning-resources',
       'introduction/ecosystem',
       'introduction/examples'
     ],
-    'Basic Tutorial': [
-      'basics/basic-tutorial',
-      'basics/actions',
-      'basics/reducers',
-      'basics/store',
-      'basics/data-flow',
-      'basics/usage-with-react',
-      'basics/example'
-    ],
-    'Advanced Tutorial': [
-      'advanced/advanced-tutorial',
-      'advanced/async-actions',
-      'advanced/async-flow',
-      'advanced/middleware',
-      'advanced/usage-with-react-router',
-      'advanced/example-reddit-api',
-      'advanced/next-steps'
+    Tutorials: [
+      'tutorials/tutorials-index',
+      {
+        type: 'category',
+        label: 'Redux Essentials',
+        items: [
+          'tutorials/essentials/part-1-overview-concepts',
+          'tutorials/essentials/part-2-app-structure',
+          'tutorials/essentials/part-3-data-flow',
+          'tutorials/essentials/part-4-using-data',
+          'tutorials/essentials/part-5-async-logic',
+          'tutorials/essentials/part-6-performance-normalization'
+        ]
+      },
+      {
+        type: 'category',
+        label: 'Redux Fundamentals',
+        items: [
+          'tutorials/fundamentals/part-1-overview',
+          'tutorials/fundamentals/part-2-concepts-data-flow',
+          'tutorials/fundamentals/part-3-state-actions-reducers',
+          'tutorials/fundamentals/part-4-store',
+          'tutorials/fundamentals/part-5-ui-react',
+          'tutorials/fundamentals/part-6-async-logic',
+          'tutorials/fundamentals/part-7-standard-patterns',
+          'tutorials/fundamentals/part-8-modern-redux'
+        ]
+      }
     ],
     Recipes: [
       'recipes/recipe-index',
@@ -41,8 +49,8 @@ module.exports = {
       'recipes/computing-derived-data',
       'recipes/implementing-undo-history',
       'recipes/isolating-redux-sub-apps',
-      'recipes/using-immutablejs-with-redux',
       'recipes/code-splitting',
+      'recipes/troubleshooting',
       {
         type: 'category',
         label: 'Structuring Reducers',
@@ -62,6 +70,25 @@ module.exports = {
         ]
       }
     ],
+    'Understanding Redux': [
+      {
+        type: 'category',
+        label: 'Thinking in Redux',
+        items: [
+          'understanding/thinking-in-redux/motivation',
+          'understanding/thinking-in-redux/three-principles',
+          'understanding/thinking-in-redux/glossary'
+        ]
+      },
+      {
+        type: 'category',
+        label: 'History and Design',
+        items: [
+          'understanding/history-and-design/prior-art',
+          'understanding/history-and-design/middleware'
+        ]
+      }
+    ],
     FAQ: [
       'faq',
       'faq/general',
@@ -77,7 +104,6 @@ module.exports = {
       'faq/miscellaneous'
     ],
     'Style Guide': ['style-guide/style-guide'],
-    Other: ['glossary', 'troubleshooting'],
     'API Reference': [
       'api/api-reference',
       'api/createstore',

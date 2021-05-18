@@ -11,6 +11,7 @@ import { Action } from './types/actions'
 import { Reducer } from './types/reducers'
 import ActionTypes from './utils/actionTypes'
 import isPlainObject from './utils/isPlainObject'
+import { kindOf } from './utils/kindOf'
 
 /**
  * Creates a Redux store that holds the state tree.
@@ -73,7 +74,7 @@ export default function createStore<
     throw new Error(
       'It looks like you are passing several store enhancers to ' +
         'createStore(). This is not supported. Instead, compose them ' +
-        'together to a single function.'
+        'together to a single function. See https://redux.js.org/tutorials/fundamentals/part-4-store#creating-a-store-with-enhancers for an example.'
     )
   }
 
@@ -84,7 +85,11 @@ export default function createStore<
 
   if (typeof enhancer !== 'undefined') {
     if (typeof enhancer !== 'function') {
-      throw new Error('Expected the enhancer to be a function.')
+      throw new Error(
+        `Expected the enhancer to be a function. Instead, received: '${kindOf(
+          enhancer
+        )}'`
+      )
     }
 
     return enhancer(createStore)(
@@ -94,7 +99,11 @@ export default function createStore<
   }
 
   if (typeof reducer !== 'function') {
-    throw new Error('Expected the reducer to be a function.')
+    throw new Error(
+      `Expected the root reducer to be a function. Instead, received: '${kindOf(
+        reducer
+      )}'`
+    )
   }
 
   let currentReducer = reducer
@@ -158,7 +167,11 @@ export default function createStore<
    */
   function subscribe(listener: () => void) {
     if (typeof listener !== 'function') {
-      throw new Error('Expected the listener to be a function.')
+      throw new Error(
+        `Expected the listener to be a function. Instead, received: '${kindOf(
+          listener
+        )}'`
+      )
     }
 
     if (isDispatching) {
@@ -224,15 +237,15 @@ export default function createStore<
   function dispatch(action: A) {
     if (!isPlainObject(action)) {
       throw new Error(
-        'Actions must be plain objects. ' +
-          'Use custom middleware for async actions.'
+        `Actions must be plain objects. Instead, the actual type was: '${kindOf(
+          action
+        )}'. You may need to add middleware to your store setup to handle dispatching other values, such as 'redux-thunk' to handle dispatching functions. See https://redux.js.org/tutorials/fundamentals/part-4-store#middleware and https://redux.js.org/tutorials/fundamentals/part-6-async-logic#using-the-redux-thunk-middleware for examples.`
       )
     }
 
     if (typeof action.type === 'undefined') {
       throw new Error(
-        'Actions may not have an undefined "type" property. ' +
-          'Have you misspelled a constant?'
+        'Actions may not have an undefined "type" property. You may have misspelled an action type string constant.'
       )
     }
 
@@ -270,14 +283,15 @@ export default function createStore<
     nextReducer: Reducer<NewState, NewActions>
   ): Store<NewState & StateExt, NewActions, StateExt, Ext> & Ext {
     if (typeof nextReducer !== 'function') {
-      throw new Error('Expected the nextReducer to be a function.')
+      throw new Error(
+        `Expected the nextReducer to be a function. Instead, received: '${kindOf(
+          nextReducer
+        )}`
+      )
     }
 
     // TODO: do this more elegantly
-    ;((currentReducer as unknown) as Reducer<
-      NewState,
-      NewActions
-    >) = nextReducer
+    ;(currentReducer as unknown as Reducer<NewState, NewActions>) = nextReducer
 
     // This action has a similar effect to ActionTypes.INIT.
     // Any reducers that existed in both the new and old rootReducer
@@ -285,7 +299,8 @@ export default function createStore<
     // the new state tree with any relevant data from the old one.
     dispatch({ type: ActionTypes.REPLACE } as A)
     // change the type of the store by casting it to the new store
-    return (store as unknown) as Store<
+
+    return store as unknown as Store<
       NewState & StateExt,
       NewActions,
       StateExt,
@@ -313,7 +328,11 @@ export default function createStore<
        */
       subscribe(observer: unknown) {
         if (typeof observer !== 'object' || observer === null) {
-          throw new TypeError('Expected the observer to be an object.')
+          throw new TypeError(
+            `Expected the observer to be an object. Instead, received: '${kindOf(
+              observer
+            )}'`
+          )
         }
 
         function observeState() {
@@ -339,12 +358,12 @@ export default function createStore<
   // the initial state tree.
   dispatch({ type: ActionTypes.INIT } as A)
 
-  const store = ({
+  const store = {
     dispatch: dispatch as Dispatch<A>,
     subscribe,
     getState,
     replaceReducer,
     [$$observable]: observable
-  } as unknown) as Store<S & StateExt, A, StateExt, Ext> & Ext
+  } as unknown as Store<S & StateExt, A, StateExt, Ext> & Ext
   return store
 }
