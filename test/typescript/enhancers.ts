@@ -338,43 +338,39 @@ function composedEnhancers() {
     enhancer2: number
   }
 
-  const enhancer1: StoreEnhancer<Ext1> = createStore => (
-    reducer,
-    preloadedState
-  ) => {
-    function replaceReducer<NewState, NewActions extends Action>(
-      nextReducer: Reducer<NewState, NewActions>
-    ) {
-      store.replaceReducer(nextReducer)
+  const enhancer1: StoreEnhancer<Ext1> =
+    createStore => (reducer, preloadedState) => {
+      function replaceReducer<NewState, NewActions extends Action>(
+        nextReducer: Reducer<NewState, NewActions>
+      ) {
+        store.replaceReducer(nextReducer)
+        return newStore
+      }
+      const store = createStore(reducer, preloadedState)
+      const newStore = {
+        ...store,
+        replaceReducer,
+        enhancer1: 'foo'
+      }
       return newStore
     }
-    const store = createStore(reducer, preloadedState)
-    const newStore = {
-      ...store,
-      replaceReducer,
-      enhancer1: 'foo'
-    }
-    return newStore
-  }
 
-  const enhancer2: StoreEnhancer<Ext2> = createStore => (
-    reducer,
-    preloadedState
-  ) => {
-    function replaceReducer<NewState, NewActions extends Action>(
-      nextReducer: Reducer<NewState, NewActions>
-    ) {
-      store.replaceReducer(nextReducer)
+  const enhancer2: StoreEnhancer<Ext2> =
+    createStore => (reducer, preloadedState) => {
+      function replaceReducer<NewState, NewActions extends Action>(
+        nextReducer: Reducer<NewState, NewActions>
+      ) {
+        store.replaceReducer(nextReducer)
+        return newStore
+      }
+      const store = createStore(reducer, preloadedState)
+      const newStore = {
+        ...store,
+        replaceReducer,
+        enhancer2: 5
+      }
       return newStore
     }
-    const store = createStore(reducer, preloadedState)
-    const newStore = {
-      ...store,
-      replaceReducer,
-      enhancer2: 5
-    }
-    return newStore
-  }
 
   const enhancedStore = createStore(reducer, createStore =>
     enhancer2(enhancer1(createStore))
