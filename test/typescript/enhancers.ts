@@ -1,4 +1,11 @@
-import { StoreEnhancer, Action, AnyAction, Reducer, createStore } from '../..'
+import {
+  StoreEnhancer,
+  Action,
+  AnyAction,
+  Reducer,
+  createStore,
+  Store
+} from '../..'
 
 interface State {
   someField: 'string'
@@ -372,9 +379,10 @@ function composedEnhancers() {
       return newStore
     }
 
-  const enhancedStore = createStore(reducer, createStore =>
+  const composedEnhancer: StoreEnhancer<Ext1 & Ext2> = createStore =>
     enhancer2(enhancer1(createStore))
-  )
+
+  const enhancedStore = createStore(reducer, composedEnhancer)
   enhancedStore.enhancer1
   enhancedStore.enhancer2
   // typings:expect-error
