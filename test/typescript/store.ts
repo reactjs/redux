@@ -5,8 +5,7 @@ import {
   Action,
   StoreEnhancer,
   Unsubscribe,
-  Observer,
-  ExtendState
+  Observer
 } from '../..'
 import 'symbol-observable'
 
@@ -20,45 +19,6 @@ type State = {
     d: 'd'
   }
   e: BrandedString
-}
-
-/* extended state */
-const noExtend: ExtendState<State, never> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  e: brandedString
-}
-// typings:expect-error
-const noExtendError: ExtendState<State, never> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  e: brandedString,
-  f: 'oops'
-}
-
-const yesExtend: ExtendState<State, { yes: 'we can' }> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  e: brandedString,
-  yes: 'we can'
-}
-// typings:expect-error
-const yesExtendError: ExtendState<State, { yes: 'we can' }> = {
-  a: 'a',
-  b: {
-    c: 'c',
-    d: 'd'
-  },
-  e: brandedString
 }
 
 interface DerivedAction extends Action {

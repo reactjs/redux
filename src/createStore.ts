@@ -5,8 +5,7 @@ import {
   PreloadedState,
   StoreEnhancer,
   Dispatch,
-  Observer,
-  ExtendState
+  Observer
 } from './types/store'
 import { Action } from './types/actions'
 import { Reducer } from './types/reducers'
@@ -43,31 +42,31 @@ export default function createStore<
   S,
   A extends Action,
   Ext = {},
-  StateExt = never
+  StateExt = {}
 >(
   reducer: Reducer<S, A>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+): Store<S & StateExt, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
   A extends Action,
   Ext = {},
-  StateExt = never
+  StateExt = {}
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+): Store<S & StateExt, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
   A extends Action,
   Ext = {},
-  StateExt = never
+  StateExt = {}
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
-): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext {
+): Store<S & StateExt, A, StateExt, Ext> & Ext {
   if (
     (typeof preloadedState === 'function' && typeof enhancer === 'function') ||
     (typeof enhancer === 'function' && typeof arguments[3] === 'function')
@@ -96,7 +95,7 @@ export default function createStore<
     return enhancer(createStore)(
       reducer,
       preloadedState as PreloadedState<S>
-    ) as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+    ) as Store<S & StateExt, A, StateExt, Ext> & Ext
   }
 
   if (typeof reducer !== 'function') {
@@ -282,7 +281,7 @@ export default function createStore<
    */
   function replaceReducer<NewState, NewActions extends A>(
     nextReducer: Reducer<NewState, NewActions>
-  ): Store<ExtendState<NewState, StateExt>, NewActions, StateExt, Ext> & Ext {
+  ): Store<NewState & StateExt, NewActions, StateExt, Ext> & Ext {
     if (typeof nextReducer !== 'function') {
       throw new Error(
         `Expected the nextReducer to be a function. Instead, received: '${kindOf(
@@ -300,8 +299,9 @@ export default function createStore<
     // the new state tree with any relevant data from the old one.
     dispatch({ type: ActionTypes.REPLACE } as A)
     // change the type of the store by casting it to the new store
+
     return store as unknown as Store<
-      ExtendState<NewState, StateExt>,
+      NewState & StateExt,
       NewActions,
       StateExt,
       Ext
@@ -364,6 +364,6 @@ export default function createStore<
     getState,
     replaceReducer,
     [$$observable]: observable
-  } as unknown as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+  } as unknown as Store<S & StateExt, A, StateExt, Ext> & Ext
   return store
 }
