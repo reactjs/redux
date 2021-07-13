@@ -46,7 +46,7 @@ export default function createStore<
   StateExt = never
 >(
   reducer: Reducer<S, A>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  enhancer?: StoreEnhancer<Ext, StateExt, S>
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
@@ -56,7 +56,7 @@ export default function createStore<
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  enhancer?: StoreEnhancer<Ext, StateExt, S>
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
@@ -65,8 +65,8 @@ export default function createStore<
   StateExt = never
 >(
   reducer: Reducer<S, A>,
-  preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt, S>,
+  enhancer?: StoreEnhancer<Ext, StateExt, S>
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext {
   if (
     (typeof preloadedState === 'function' && typeof enhancer === 'function') ||
@@ -80,7 +80,7 @@ export default function createStore<
   }
 
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-    enhancer = preloadedState as StoreEnhancer<Ext, StateExt>
+    enhancer = preloadedState as StoreEnhancer<Ext, StateExt, S>
     preloadedState = undefined
   }
 
@@ -93,10 +93,7 @@ export default function createStore<
       )
     }
 
-    return enhancer(createStore)(
-      reducer,
-      preloadedState as PreloadedState<S>
-    ) as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
+    return enhancer(createStore)(reducer, preloadedState as PreloadedState<S>)
   }
 
   if (typeof reducer !== 'function') {
